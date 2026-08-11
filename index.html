@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You 🌸</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Mali:wght@500;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Prompt', 'Mali', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #f7e8eb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Container เลียนแบบหน้าจอไอโฟนตามคลิป */
+        .mobile-card {
+            position: relative;
+            width: 100%;
+            max-width: 430px;
+            height: 100%;
+            max-height: 932px;
+            background: #faf2f4;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Background ภาพดอกไม้วินเทจแบบในคลิป */
+        .floral-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=800&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.18;
+            pointer-events: none;
+        }
+
+        /* ----------------------------------
+           STEP 1: หน้าซองจดหมายแบบกดปุ่ม
+        ---------------------------------- */
+        .step-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.6s ease;
+            z-index: 10;
+        }
+
+        .step-container.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 180px;
+            height: 120px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(220, 150, 160, 0.3);
+            border: 1px solid #f3d5dc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 35px;
+            cursor: pointer;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 90px solid transparent;
+            border-right: 90px solid transparent;
+            border-top: 65px solid #f8c8d2;
+            transform-origin: top;
+            transition: transform 0.4s ease;
+        }
+
+        .envelope-seal {
+            position: relative;
+            z-index: 2;
+            width: 42px;
+            height: 42px;
+            background: #e66b81;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(230, 107, 129, 0.4);
+        }
+
+        .btn-open-letter {
+            background: linear-gradient(135deg, #ff758f, #ff4d6d);
+            color: #fff;
+            border: none;
+            padding: 14px 36px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 77, 109, 0.35);
+            transition: transform 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-open-letter:active {
+            transform: scale(0.95);
+        }
+
+        /* ----------------------------------
+           STEP 2: ฉากกุหลาบเบิ้มๆ บานเต็มจอ (Flower Transition)
+        ---------------------------------- */
+        .flower-transition-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(253, 242, 244, 0.95);
+            transition: opacity 0.5s ease;
+        }
+
+        .flower-transition-screen.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ดอกกุหลาบช่อแน่นสไตล์ในคลิป */
+        .blooming-flower-img {
+            width: 280px;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 15px 35px rgba(230, 107, 129, 0.4);
+            transform: scale(0.2) rotate(-10deg);
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .flower-transition-screen.active .blooming-flower-img {
+            transform: scale(1) rotate(0deg);
+        }
+
+        .loveyou-banner {
+            margin-top: 25px;
+            font-family: 'Caveat', cursive;
+            font-size: 3.8rem;
+            color: #e63956;
+            text-shadow: 0 4px 12px rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease 0.3s;
+        }
+
+        .flower-transition-screen.active .loveyou-banner {
+            opacity: 1;
+            transform: translateY(0);
+            animation: heartBeat 1.2s infinite alternate;
+        }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* หัวใจลอยกระจาย */
+        .floating-heart {
+            position: absolute;
+            color: #ff4d6d;
+            pointer-events: none;
+            animation: floatUp 1.6s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(0.6); }
+            100% { opacity: 0; transform: translateY(-160px) scale(1.3); }
+        }
+
+        /* ----------------------------------
+           STEP 3: หน้าสุดท้าย - ฝังวิดีโอ YouTube ในกรอบดอกไม้
+        ---------------------------------- */
+        .music-card-container {
+            position: absolute;
+            width: 88%;
+            max-width: 360px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            padding: 25px 18px;
+            box-shadow: 0 15px 35px rgba(214, 125, 142, 0.25);
+            border: 2px solid #f8c8d2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20;
+        }
+
+        .music-card-container.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        /* กรอบล้อมรอบวิดีโอด้วยดอกไม้และหัวใจ */
+        .flower-frame {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            margin-top: 10px;
+        }
+
+        /* เครื่องเล่น YouTube ฝังในหน้าสุดท้าย */
+        .youtube-embed-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* อัตราส่วน 16:9 */
+            height: 0;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border: 3px solid #ffffff;
+            z-index: 2;
+        }
+
+        .youtube-embed-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* ไอคอนดอกไม้และหัวใจที่ล้อมรอบกรอบ */
+        .decor-icon {
+            position: absolute;
+            font-size: 1.5rem;
+            z-index: 3;
+        }
+        .pos-top { top: -18px; left: 50%; transform: translateX(-50%); }
+        .pos-bottom { bottom: -18px; left: 50%; transform: translateX(-50%); }
+        .pos-left { left: -15px; top: 50%; transform: translateY(-50%); }
+        .pos-right { right: -15px; top: 50%; transform: translateY(-50%); }
+        .pos-tr { top: -10px; right: -8px; }
+        .pos-bl { bottom: -10px; left: -8px; }
+
+        .song-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #3d2c2e;
+            margin-top: 8px;
+            margin-bottom: 2px;
+            text-align: center;
+        }
+
+        .artist-name {
+            font-size: 0.95rem;
+            color: #e65c7b;
+            font-weight: 500;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-card">
+        <div class="floral-bg"></div>
+
+        <!-- 1. ปุ่มจดหมายหน้าแรก -->
+        <div class="step-container" id="envelopeStep">
+            <div class="envelope-wrapper">
+                <div class="envelope-flap" id="envFlap"></div>
+                <div class="envelope-seal"><i class="fas fa-heart"></i></div>
+            </div>
+            <button class="btn-open-letter" onclick="startFlowerAnimation()">
+                กดเพื่อเปิดจดหมาย 💌
+            </button>
+        </div>
+
+        <!-- 2. ฉากป๊อบอัพดอกกุหลาบเด้งบาน + Love you -->
+        <div class="flower-transition-screen" id="flowerTransition">
+            <img src="https://images.unsplash.com/photo-1518895949257-7621c3c786d7?q=80&w=600&auto=format&fit=crop" class="blooming-flower-img" alt="Rose Bloom">
+            <div class="loveyou-banner">Love you ❤️</div>
+        </div>
+
+        <!-- 3. หน้าสุดท้าย: ฝังวิดีโอ YouTube เพลง Japanese Denim ในกรอบดอกไม้/หัวใจ -->
+        <div class="music-card-container" id="musicStep">
+            <div class="flower-frame">
+                <!-- ดอกไม้และหัวใจล้อมรอบ -->
+                <span class="decor-icon pos-top">🌹</span>
+                <span class="decor-icon pos-bottom">🌷</span>
+                <span class="decor-icon pos-left">🌸</span>
+                <span class="decor-icon pos-right">🌺</span>
+                <span class="decor-icon pos-tr">💖</span>
+                <span class="decor-icon pos-bl">💕</span>
+                
+                <!-- เครื่องเล่น YouTube -->
+                <div class="youtube-embed-wrapper">
+                    <iframe id="youtubePlayer" src="" title="Daniel Caesar - Japanese Denim" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <div class="song-name">Japanese Denim</div>
+            <div class="artist-name">Daniel Caesar</div>
+        </div>
+
+    </div>
+
+    <script>
+        const envelopeStep = document.getElementById('envelopeStep');
+        const envFlap = document.getElementById('envFlap');
+        const flowerTransition = document.getElementById('flowerTransition');
+        const musicStep = document.getElementById('musicStep');
+        const youtubePlayer = document.getElementById('youtubePlayer');
+
+        function startFlowerAnimation() {
+            // 1. เปิดฝาจดหมาย
+            envFlap.style.transform = 'rotateX(180deg)';
+
+            setTimeout(() => {
+                // ซ่อนจดหมาย
+                envelopeStep.classList.add('hidden');
+
+                // 2. เด้งป๊อบอัพกุหลาบบาน + ข้อความ Love you
+                flowerTransition.classList.add('active');
+                spawnHearts();
+
+                // 3. แสดงค้างไว้ 3 วินาทีแล้วเปลี่ยนเป็นหน้าเครื่องเล่นเพลง YouTube
+                setTimeout(() => {
+                    flowerTransition.style.opacity = '0';
+
+                    setTimeout(() => {
+                        flowerTransition.classList.remove('active');
+                        // แสดงหน้าเพลง Japanese Denim (YouTube Player)
+                        musicStep.classList.add('active');
+                        
+                        // โหลดและเล่นวิดีโอ YouTube อัตโนมัติเมื่อเข้าสู่หน้าสุดท้าย
+                        youtubePlayer.src = "https://www.youtube.com/embed/FG2PgVl0Nlc?autoplay=1&rel=0";
+                    }, 500);
+
+                }, 3000);
+
+            }, 400);
+        }
+
+        // สร้างเอฟเฟกต์หัวใจลอยกระจาย
+        function spawnHearts() {
+            for (let i = 0; i < 18; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('i');
+                    heart.className = 'fas fa-heart floating-heart';
+                    heart.style.left = (25 + Math.random() * 50) + '%';
+                    heart.style.top = (45 + Math.random() * 25) + '%';
+                    heart.style.fontSize = (1.2 + Math.random() * 1.5) + 'rem';
+                    flowerTransition.appendChild(heart);
+
+                    setTimeout(() => heart.remove(), 1600);
+                }, i * 100);
+            }
+        }
+    </script>
+</body>
+</html>
